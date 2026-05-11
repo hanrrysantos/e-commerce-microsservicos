@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: order-service
+
+  datasource:
+    url: jdbc:postgresql://${SPRING_DATASOURCE_URL_HOST:localhost}:${SPRING_DATASOURCE_URL_PORT:5435}/orders_db
+    username: hanrry
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  rabbitmq:
+    addresses: amqps://knywylys:7wb1bnrkwSiIS9s9u3T_Moej4G3QKFsR@cougar.rmq.cloudamqp.com/knywylys
+
