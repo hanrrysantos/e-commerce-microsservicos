@@ -1,7 +1,7 @@
 package br.com.hanrry.deliveries_service.consumer;
 
 import br.com.hanrry.deliveries_service.config.RabbitMQConfig;
-import br.com.hanrry.deliveries_service.dto.OrderEventDTO;
+import br.com.hanrry.deliveries_service.dto.event.OrderEventDTO;
 import br.com.hanrry.deliveries_service.service.DeliveriesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
