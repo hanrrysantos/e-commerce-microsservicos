@@ -39,6 +39,10 @@ public class OrderService {
             item.setOrder(order);
         });
 
+        if (order.getAddress() != null) {
+            order.getAddress().setOrder(order);
+        }
+
         BigDecimal totalValue = order.getItems().stream()
                 .map(OrderItemEntity::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

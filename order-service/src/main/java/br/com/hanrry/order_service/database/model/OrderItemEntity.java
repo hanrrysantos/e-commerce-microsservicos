@@ -29,9 +29,12 @@ public class OrderItemEntity {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Column(nullable = false)
+    private String productName;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal unitPrice;
 
-    @Column(nullable = false, precision = 10, scale = 20)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 }

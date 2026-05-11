@@ -8,8 +8,6 @@ public record OrderEventDTO (
         String orderCode,
         String clientName,
         String clientEmail,
-        BigDecimal totalValue,
-        TypeProduct typeProduct,
-        CategoryProduct categoryProduct
+        BigDecimal totalValue
 ){
 }
