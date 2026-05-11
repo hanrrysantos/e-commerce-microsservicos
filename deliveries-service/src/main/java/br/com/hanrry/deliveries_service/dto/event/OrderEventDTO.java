@@ -1,4 +1,4 @@
-package br.com.hanrry.deliveries_service.dto;
+package br.com.hanrry.deliveries_service.dto.event;
 
 import br.com.hanrry.deliveries_service.enums.OrderStatus;
 
