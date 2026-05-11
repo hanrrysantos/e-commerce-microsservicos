@@ -3,8 +3,8 @@ package br.com.hanrry.deliveries_service.enums;
 public enum DeliveriesStatus {
 
     PENDING,
-    PREPARING,
-    SHIPPED,
+    CONFIRMED,    // Adicione esta
+    IN_TRANSIT,  // Adicione esta
     DELIVERED,
     CANCELLED
 }
