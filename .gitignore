@@ -1,0 +1,35 @@
+# === JAVA & MAVEN ===
+# Ignora a pasta de build de TODOS os microsserviços
+**/target/
+*.class
+*.war
+*.ear
+*.jar
+
+# Maven Wrapper (Se você optar por não usar, pode apagar os arquivos físicos)
+.mvn/
+mvnw
+mvnw.cmd
+
+# === IDEs (IntelliJ, VS Code, Eclipse) ===
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.vscode/
+.classpath
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# === DOCKER & SISTEMA ===
+# Caso você use volumes locais para persistir dados de DB nos containers
+**/data/
+.DS_Store
+Thumbs.db
+
+# === LOGS ===
+*.log
+logs/

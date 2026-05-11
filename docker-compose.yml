@@ -1,0 +1,90 @@
+version: '3.8'
+services:
+
+  db-orders:
+    image: postgres:16-alpine
+    container_name: db-orders
+    environment:
+      - POSTGRES_DB=orders_db
+      - POSTGRES_USER=hanrry
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data/orders:/var/lib/postgresql/data
+
+  db-notifications:
+      image: postgres:16-alpine
+      container_name: db-notifications
+      environment:
+        - POSTGRES_DB=notifications_db
+        - POSTGRES_USER=hanrry
+        - POSTGRES_PASSWORD=1234
+      ports:
+        - "5434:5432"
+      volumes:
+        - ./data/notifications:/var/lib/postgresql/data
+
+  db-deliveries:
+      image: postgres:16-alpine
+      container_name: db-deliveries
+      environment:
+        - POSTGRES_DB=deliveries_db
+        - POSTGRES_USER=hanrry
+        - POSTGRES_PASSWORD=1234
+      ports:
+        - "5435:5432"
+      volumes:
+        - ./data/deliveries:/var/lib/postgresql/data
+
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    image: e-commerce/order-service:1.0
+    container_name: order-service
+    depends_on:
+      - db-orders
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_DATASOURCE_URL_HOST=db-orders
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-orders:5432/orders_db
+      - SPRING_DATASOURCE_USERNAME=hanrry
+      - SPRING_DATASOURCE_PASSWORD=1234
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    image: e-commerce/notification-service:1.0
+    container_name: notification-service
+    depends_on:
+      - db-notifications
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_DATASOURCE_URL_HOST=db-notifications
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-notifications:5432/notifications_db
+      - SPRING_DATASOURCE_USERNAME=hanrry
+      - SPRING_DATASOURCE_PASSWORD=1234
+
+  deliveries-service:
+    build:
+      context: ./deliveries-service
+      dockerfile: Dockerfile
+    image: e-commerce/deliveries-service:1.0
+    container_name: deliveries-service
+    depends_on:
+      - db-deliveries
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_DATASOURCE_URL_HOST=db-deliveries
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-deliveries:5432/deliveries_db
+      - SPRING_DATASOURCE_USERNAME=hanrry
+      - SPRING_DATASOURCE_PASSWORD=1234
+
+networks:
+  default:
+    name: ecommerce-network
