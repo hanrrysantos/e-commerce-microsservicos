@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: notification-service
+
+
+  datasource:
+    url: jdbc:postgresql://${SPRING_DATASOURCE_URL_HOST:localhost}:${SPRING_DATASOURCE_URL_PORT:5434}/notifications_db
+    username: hanrry
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: sheinhanrry@gmail.com
+    password: qdryofxaeudbkoki
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+  rabbitmq:
+    addresses: amqps://knywylys:7wb1bnrkwSiIS9s9u3T_Moej4G3QKFsR@cougar.rmq.cloudamqp.com/knywylys
