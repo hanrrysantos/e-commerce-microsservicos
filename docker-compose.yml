@@ -6,36 +6,36 @@ services:
     container_name: db-orders
     environment:
       - POSTGRES_DB=orders_db
-      - POSTGRES_USER=hanrry
-      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
       - ./data/orders:/var/lib/postgresql/data
 
   db-notifications:
-      image: postgres:16-alpine
-      container_name: db-notifications
-      environment:
-        - POSTGRES_DB=notifications_db
-        - POSTGRES_USER=hanrry
-        - POSTGRES_PASSWORD=1234
-      ports:
-        - "5434:5432"
-      volumes:
-        - ./data/notifications:/var/lib/postgresql/data
+    image: postgres:16-alpine
+    container_name: db-notifications
+    environment:
+      - POSTGRES_DB=notifications_db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./data/notifications:/var/lib/postgresql/data
 
   db-deliveries:
-      image: postgres:16-alpine
-      container_name: db-deliveries
-      environment:
-        - POSTGRES_DB=deliveries_db
-        - POSTGRES_USER=hanrry
-        - POSTGRES_PASSWORD=1234
-      ports:
-        - "5435:5432"
-      volumes:
-        - ./data/deliveries:/var/lib/postgresql/data
+    image: postgres:16-alpine
+    container_name: db-deliveries
+    environment:
+      - POSTGRES_DB=deliveries_db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./data/deliveries:/var/lib/postgresql/data
 
   order-service:
     build:
@@ -50,8 +50,9 @@ services:
     environment:
       - SPRING_DATASOURCE_URL_HOST=db-orders
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-orders:5432/orders_db
-      - SPRING_DATASOURCE_USERNAME=hanrry
-      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
 
   notification-service:
     build:
@@ -66,8 +67,11 @@ services:
     environment:
       - SPRING_DATASOURCE_URL_HOST=db-notifications
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-notifications:5432/notifications_db
-      - SPRING_DATASOURCE_USERNAME=hanrry
-      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
+      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
 
   deliveries-service:
     build:
@@ -82,8 +86,9 @@ services:
     environment:
       - SPRING_DATASOURCE_URL_HOST=db-deliveries
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-deliveries:5432/deliveries_db
-      - SPRING_DATASOURCE_USERNAME=hanrry
-      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
 
 networks:
   default:
