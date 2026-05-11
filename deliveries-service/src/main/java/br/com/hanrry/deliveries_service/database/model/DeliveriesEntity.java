@@ -30,12 +30,25 @@ public class DeliveriesEntity {
     @Column(nullable = false)
     private String clientEmail;
 
+    @Column(nullable = false)
+    private String street;
+
+    @Column(nullable = false)
+    private String city;
+
+    @Column(nullable = false)
+    private String state;
+
+    @Column(nullable = false)
+    private String zipCode;
+
+    @Column(nullable = false)
+    private String country;
+
     @Enumerated(EnumType.STRING)
     private DeliveriesStatus status;
 
     private String trackingCode;
-
-    private String productType;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
