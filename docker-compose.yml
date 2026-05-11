@@ -11,7 +11,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./data/orders:/var/lib/postgresql/data
+      - orders_data:/var/lib/postgresql/data
 
   db-notifications:
     image: postgres:16-alpine
@@ -23,7 +23,7 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - ./data/notifications:/var/lib/postgresql/data
+      - notifications_data:/var/lib/postgresql/data
 
   db-deliveries:
     image: postgres:16-alpine
@@ -35,7 +35,7 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - ./data/deliveries:/var/lib/postgresql/data
+      - deliveries_data:/var/lib/postgresql/data
 
   order-service:
     build:
@@ -93,3 +93,8 @@ services:
 networks:
   default:
     name: ecommerce-network
+
+volumes:
+  orders_data:
+  notifications_data:
+  deliveries_data:
