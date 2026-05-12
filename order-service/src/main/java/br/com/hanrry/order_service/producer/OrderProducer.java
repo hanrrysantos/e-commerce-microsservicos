@@ -3,9 +3,11 @@ package br.com.hanrry.order_service.producer;
 import br.com.hanrry.order_service.dto.event.OrderEventDTO;
 import br.com.hanrry.order_service.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OrderProducer {
@@ -19,6 +21,6 @@ public class OrderProducer {
             event.status().name().toLowerCase());
         rabbitTemplate.convertAndSend(EXCHANGE_NAME, routingKey, event);
 
-        System.out.println(">>> [LOG] Evento enviado para CloudAMQP | Key: " + routingKey);
+        log.info(">>> [LOG] Evento enviado para CloudAMQP | Key: " + routingKey);
     }
 }
