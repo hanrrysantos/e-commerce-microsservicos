@@ -20,10 +20,13 @@ public class NotificationEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private UUID orderId;
 
     private String emailFrom;
+
+    @Column(nullable = false)
+    private String name;
 
     @Column(nullable = false)
     private String clientEmail;
