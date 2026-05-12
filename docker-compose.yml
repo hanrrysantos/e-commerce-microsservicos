@@ -36,6 +36,30 @@ services:
     volumes:
       - deliveries_data:/var/lib/postgresql/data
 
+  db-payments:
+    image: postgres:16-alpine
+    container_name: db-payments
+    environment:
+      - POSTGRES_DB=payments_db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5436:5432"
+    volumes:
+      - payments_data:/var/lib/postgresql/data
+
+  db-users:
+    image: postgres:16-alpine
+    container_name: db-users
+    environment:
+      - POSTGRES_DB=users_db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5437:5432"
+    volumes:
+      - users_data:/var/lib/postgresql/data
+
   order-service:
     build:
       context: ./order-service
@@ -47,7 +71,7 @@ services:
     ports:
       - "8081:8080"
     environment:
-      - SPRING_DATASOURCE_URL_HOST=db-orders
+      - SPRING_DATASOURCE_HOST=db-orders
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-orders:5432/orders_db
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
@@ -64,7 +88,7 @@ services:
     ports:
       - "8082:8080"
     environment:
-      - SPRING_DATASOURCE_URL_HOST=db-notifications
+      - SPRING_DATASOURCE_HOST=db-notifications
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-notifications:5432/notifications_db
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
@@ -83,8 +107,42 @@ services:
     ports:
       - "8083:8080"
     environment:
-      - SPRING_DATASOURCE_URL_HOST=db-deliveries
+      - SPRING_DATASOURCE_HOST=db-deliveries
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-deliveries:5432/deliveries_db
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    image: e-commerce/payment-service:1.0
+    container_name: payment-service
+    depends_on:
+      - db-payments
+    ports:
+      - "8084:8080"
+    environment:
+      - SPRING_DATASOURCE_HOST=db-payments
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-payments:5432/payments_db
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    image: e-commerce/user-service:1.0
+    container_name: user-service
+    depends_on:
+      - db-users
+    ports:
+      - "8085:8080"
+    environment:
+      - SPRING_DATASOURCE_HOST=db-users
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-users:5432/users_db
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
@@ -97,3 +155,5 @@ volumes:
   orders_data:
   notifications_data:
   deliveries_data:
+  payments_data:
+  users_data:
