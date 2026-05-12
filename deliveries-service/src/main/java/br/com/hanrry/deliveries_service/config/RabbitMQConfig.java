@@ -14,7 +14,7 @@ public class RabbitMQConfig {
 
     public static final String QUEUE_DELIVERIES = "queue.deliveries";
     public static final String EXCHANGE_NAME = "order.v1.events";
-    public static final String BINDING_KEY = "order.pending";
+    public static final String BINDING_KEY = "order.confirmed";
 
     @Bean
     public Queue logisticsQueue() {
