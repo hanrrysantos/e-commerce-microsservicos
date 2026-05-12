@@ -2,8 +2,13 @@ package br.com.hanrry.notification_service.service;
 
 import br.com.hanrry.notification_service.database.model.NotificationEntity;
 import br.com.hanrry.notification_service.database.repository.INotificationRepository;
-import br.com.hanrry.notification_service.dto.OrderEventDTO;
+import br.com.hanrry.notification_service.dto.event.OrderEventDTO;
+import br.com.hanrry.notification_service.dto.event.UserEventDTO;
+import br.com.hanrry.notification_service.dto.response.NotificationResponseDTO;
 import br.com.hanrry.notification_service.enums.NotificationStatus;
+import br.com.hanrry.notification_service.exception.NotNecessaryResendEmailException;
+import br.com.hanrry.notification_service.exception.NotificationNotFoundException;
+import br.com.hanrry.notification_service.infra.EmailMailer;
 import br.com.hanrry.notification_service.mapper.INotificationMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,48 +19,68 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationService {
 
     private final INotificationRepository notificationRepository;
-    private final JavaMailSender emailSender;
-    private final INotificationMapper notificationMapper; // Este cara monta o texto!
+    private final INotificationMapper notificationMapper;
+    private final EmailMailer emailMailer; // Novo componente
 
     @Value("${spring.mail.username}")
     private String emailFrom;
 
     @Transactional
-    public void processNotification(OrderEventDTO eventDTO) {
-        NotificationEntity entity = notificationMapper.toEntity(eventDTO);
+    public void processOrderNotification(OrderEventDTO eventDTO) {
+        NotificationEntity entity = notificationMapper.OrderEventToEntity(eventDTO);
         entity.setEmailFrom(emailFrom);
         entity.setSubject("Pedido Recebido: " + eventDTO.orderCode());
         entity.setContent(String.format(
-                "Olá %s!\n\nRecebemos o seu pedido %s com sucesso.\nValor total: R$ %s\n\nEstamos processando tudo!",
-                eventDTO.clientName(), eventDTO.orderCode(), eventDTO.totalValue()
+            "Olá %s!\n\nRecebemos o seu pedido %s com sucesso.\nValor total: R$ %s\n\nEstamos processando tudo!",
+            eventDTO.clientName(), eventDTO.orderCode(), eventDTO.totalValue()
         ));
 
+        executeSending(entity);
+    }
+
+    @Transactional
+    public void processUserNotification(UserEventDTO eventDTO) {
+        NotificationEntity entity = notificationMapper.UserEventToEntity(eventDTO);
+        entity.setEmailFrom(emailFrom);
+        entity.setSubject("Bem-vindo(a): " + eventDTO.name());
+        entity.setContent(String.format(
+            "Olá %s!\n\nSua conta está pronta. Que tal conferir as ofertas de hoje?", eventDTO.name()
+        ));
+
+        executeSending(entity);
+    }
+
+    @Transactional
+    public void resendNotification(UUID id) {
+        NotificationEntity notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new NotificationNotFoundException("Notification not found"));
+
+        if (notification.getStatus() != NotificationStatus.FAILED) {
+            throw new NotNecessaryResendEmailException("Only FAILED notifications can be resent");
+        }
+
+        log.info("Reenviando notificação: {}", id);
+        executeSending(notification);
+    }
+
+    private void executeSending(NotificationEntity entity) {
         entity = notificationRepository.save(entity);
 
         try {
-            log.info("Tentando enviar e-mail para: {}", entity.getClientEmail());
-
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(entity.getEmailFrom());
-            message.setTo(entity.getClientEmail());
-            message.setSubject(entity.getSubject());
-            message.setText(entity.getContent());
-
-            emailSender.send(message);
+            emailMailer.send(entity);
             entity.setStatus(NotificationStatus.SENT);
-            log.info("E-mail enviado com sucesso!");
         } catch (MailException e) {
             entity.setStatus(NotificationStatus.FAILED);
-            log.error("Erro ao enviar e-mail para {}: {}", entity.getClientEmail(), e.getMessage());
-        } finally {
-            notificationRepository.save(entity);
+            log.error("Falha no envio: {}", e.getMessage());
         }
     }
-
 }
