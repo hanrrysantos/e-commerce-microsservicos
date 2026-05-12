@@ -1,4 +1,4 @@
-package br.com.hanrry.notification_service.dto;
+package br.com.hanrry.notification_service.dto.event;
 
 import java.math.BigDecimal;
 import java.util.UUID;
