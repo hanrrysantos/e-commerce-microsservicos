@@ -14,12 +14,17 @@ public class RabbitMQConfig {
 
     public static final String QUEUE_ORDER_NOTIFICATIONS = "queue.order.notifications";
     public static final String QUEUE_USER_NOTIFICATIONS = "queue.user.notifications";
+    public static final String QUEUE_PAYMENT_NOTIFICATIONS = "queue.payment.notifications";
+
 
     public static final String EXCHANGE_ORDER_NAME = "order.v1.events";
     public static final String EXCHANGE_USER_NAME = "user.v1.events";
+    public static final String EXCHANGE_PAYMENT_NAME = "payment.v1.events";
+
 
     public static final String ORDER_BINDING_KEY = "order.#";
     public static final String USER_BINDING_KEY = "user.#";
+    public static final String PAYMENT_BINDING_KEY = "payment.#";
 
     @Bean
     public Queue notificationQueue() {
@@ -42,6 +47,16 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue paymentNotificationQueue() {
+        return new Queue(QUEUE_PAYMENT_NOTIFICATIONS, true);
+    }
+
+    @Bean
+    public TopicExchange paymentExchange() {
+        return new TopicExchange(EXCHANGE_PAYMENT_NAME);
+    }
+
+    @Bean
     public Binding notificationBinding(Queue notificationQueue, TopicExchange orderExchange) {
         return BindingBuilder
                 .bind(notificationQueue)
@@ -55,6 +70,14 @@ public class RabbitMQConfig {
                 .bind(userNotificationQueue)
                 .to(userExchange)
                 .with(USER_BINDING_KEY);
+    }
+
+    @Bean
+    public Binding paymentNotificationBinding(Queue paymentNotificationQueue, TopicExchange paymentExchange) {
+        return BindingBuilder
+                .bind(paymentNotificationQueue)
+                .to(paymentExchange)
+                .with(PAYMENT_BINDING_KEY);
     }
 
     @Bean
