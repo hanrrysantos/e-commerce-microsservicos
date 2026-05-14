@@ -1,7 +1,7 @@
-package br.com.hanrry.payment_service.dto.event;
+package br.com.hanrry.notification_service.dto.event;
 
-import br.com.hanrry.payment_service.enums.PaymentMethod;
-import br.com.hanrry.payment_service.enums.PaymentStatus;
+import br.com.hanrry.notification_service.enums.PaymentMethod;
+import br.com.hanrry.notification_service.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,4 +16,5 @@ public record PaymentEventDTO(
         PaymentMethod method,
         PaymentStatus status,
         LocalDateTime processedAt
-) {}
+) {
+}
