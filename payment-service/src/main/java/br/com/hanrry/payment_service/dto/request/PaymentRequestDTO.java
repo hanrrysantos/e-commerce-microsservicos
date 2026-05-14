@@ -1,18 +1,12 @@
 package br.com.hanrry.payment_service.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import br.com.hanrry.payment_service.enums.PaymentMethod;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record PaymentRequestDTO(
-        @NotBlank(message = "Order code is required")
-        String orderCode,
-        @NotNull(message = "Amount is required")
+        UUID orderId,
+        String clientEmail,
         BigDecimal amount,
-        @NotBlank(message = "Payment method is required")
-        String paymentMethod,
-        String cardNumber,
-        String cardHolderName,
-        String expiryDate,
-        String cvv
+        PaymentMethod method
 ) {}
