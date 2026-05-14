@@ -19,7 +19,7 @@ public class UserProducer {
        String routingKey = String.format("user.%s", event.status().name().toLowerCase());
 
         rabbitTemplate.convertAndSend(EXCHANGE_NAME, routingKey, event);
-        log.info(">>> [LOG] Evento enviado para CloudAMQP | Key: " + routingKey);
+        log.info("Evento de cadastro de usuário enviado ao Broker: {}", routingKey);
     }
 
 
