@@ -17,8 +17,7 @@ public class DeliveriesConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_DELIVERIES)
     public void consumeOrderEvent(OrderEventDTO event){
-
+        log.info("Evento recebido na fila de Entrega: {}", event.orderCode());
         deliveriesService.processOrder(event);
-        log.info(">>> Mensagem recebida na fila de Logística: {}", event.orderCode());
     }
 }
