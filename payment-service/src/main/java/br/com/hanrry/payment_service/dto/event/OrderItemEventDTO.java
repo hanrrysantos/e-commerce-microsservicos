@@ -1,10 +1,12 @@
 package br.com.hanrry.payment_service.dto.event;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record OrderItemEventDTO(
-        String productCode,
+        UUID productId,
         String productName,
+        Integer quantity,
         BigDecimal unitPrice,
-        Integer quantity
+        BigDecimal subTotal
 ) {}

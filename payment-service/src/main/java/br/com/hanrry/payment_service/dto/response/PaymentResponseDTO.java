@@ -1,14 +1,14 @@
 package br.com.hanrry.payment_service.dto.response;
 
 import br.com.hanrry.payment_service.enums.PaymentStatus;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record PaymentResponseDTO(
-        String paymentId,
-        String orderCode,
-        BigDecimal amount,
+        UUID id,
+        UUID orderId,
         PaymentStatus status,
-        String message,
-        LocalDateTime processedAt
+        String qrCode,
+        LocalDateTime createdAt,
+        String externalId
 ) {}
