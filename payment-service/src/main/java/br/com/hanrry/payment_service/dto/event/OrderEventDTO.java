@@ -1,16 +1,18 @@
 package br.com.hanrry.payment_service.dto.event;
 
+import br.com.hanrry.payment_service.enums.OrderStatus;
+
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record OrderEventDTO(
+        UUID id,
         String orderCode,
-        String customerName,
-        String customerEmail,
-        BigDecimal totalAmount,
-        String status,
+        String clientName,
+        String clientEmail,
+        OrderStatus status,
+        BigDecimal totalValue,
         List<OrderItemEventDTO> items,
-        OrderAddressEventDTO address,
-        LocalDateTime createdAt
+        OrderAddressEventDTO address
 ) {}

@@ -1,15 +1,13 @@
 package br.com.hanrry.payment_service.controller;
 
-import br.com.hanrry.payment_service.dto.request.PaymentRequestDTO;
 import br.com.hanrry.payment_service.dto.response.PaymentResponseDTO;
 import br.com.hanrry.payment_service.service.PaymentService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/payments")
@@ -18,11 +16,21 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @PostMapping
-    public ResponseEntity<PaymentResponseDTO> processPayment(
-            @RequestBody @Valid PaymentRequestDTO requestDTO) {
+    @GetMapping("/{id}")
+    public ResponseEntity<PaymentResponseDTO> findById(@PathVariable UUID id) {
+        PaymentResponseDTO response = paymentService.findPaymentById(id);
+        return ResponseEntity.ok(response);
+    }
 
-        PaymentResponseDTO response = paymentService.processPayment(requestDTO);
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<PaymentResponseDTO> findByOrderId(@PathVariable UUID orderId) {
+        PaymentResponseDTO response = paymentService.findPaymentByOrderId(orderId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PaymentResponseDTO>> findAll() {
+        List<PaymentResponseDTO> response = paymentService.findAllPayments();
         return ResponseEntity.ok(response);
     }
 }
