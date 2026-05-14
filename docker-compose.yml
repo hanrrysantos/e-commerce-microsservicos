@@ -19,6 +19,12 @@ services:
       - POSTGRES_DB=notifications_db
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck: # Adicione isso
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d notifications_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
     ports:
       - "5434:5432"
     volumes:
@@ -84,7 +90,8 @@ services:
     image: e-commerce/notification-service:1.0
     container_name: notification-service
     depends_on:
-      - db-notifications
+      db-notifications:
+        condition: service_healthy
     ports:
       - "8082:8080"
     environment:
@@ -129,6 +136,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
+      - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
 
   user-service:
     build:
