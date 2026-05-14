@@ -4,6 +4,7 @@ import br.com.hanrry.order_service.database.model.OrderEntity;
 import br.com.hanrry.order_service.database.model.OrderItemEntity;
 import br.com.hanrry.order_service.database.repository.IOrderRepository;
 import br.com.hanrry.order_service.dto.event.OrderEventDTO;
+import br.com.hanrry.order_service.dto.event.PaymentEventDTO;
 import br.com.hanrry.order_service.dto.request.OrderRequestDTO;
 import br.com.hanrry.order_service.dto.response.OrderResponseDTO;
 import br.com.hanrry.order_service.enums.OrderStatus;
@@ -13,6 +14,7 @@ import br.com.hanrry.order_service.exception.OrdersNotFoundException;
 import br.com.hanrry.order_service.mapper.IOrderMapper;
 import br.com.hanrry.order_service.producer.OrderProducer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OrderService {
 
     private final IOrderMapper orderMapper;
@@ -105,4 +108,33 @@ public class OrderService {
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
     }
+
+    @Transactional
+    public void updateOrderStatusFromPayment(PaymentEventDTO event) {
+
+        OrderEntity order = orderRepository.findById(event.orderId()).orElseThrow(
+                () -> new OrderNotFoundException("Order not found with id: " + event.orderId())
+        );
+
+        switch (event.status()) {
+            case APPROVED -> order.setStatus(OrderStatus.CONFIRMED);
+            case REJECTED, CANCELLED -> order.setStatus(OrderStatus.CANCELLED);
+            case PENDING, IN_PROCESS -> {
+                log.info("Pedido {} aguardando processamento do pagamento (Status: {})", order.getId(), event.status());
+                return;
+            }
+            default -> {
+                log.warn("Status de pagamento não mapeado para ação: {}", event.status());
+                return;
+            }
+        }
+
+        OrderEntity savedOrder = orderRepository.save(order);
+        OrderEventDTO orderEvent = orderMapper.toEventDTO(savedOrder);
+        orderProducer.sendOrderEvent(orderEvent);
+
+        log.info("Pedido {} atualizado para {} a partir do status de pagamento: {}",
+                order.getId(), order.getStatus(), event.status());
+    }
+
 }

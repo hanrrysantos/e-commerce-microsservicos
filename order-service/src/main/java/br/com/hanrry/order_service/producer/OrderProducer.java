@@ -21,6 +21,6 @@ public class OrderProducer {
             event.status().name().toLowerCase());
         rabbitTemplate.convertAndSend(EXCHANGE_NAME, routingKey, event);
 
-        log.info(">>> [LOG] Evento enviado para CloudAMQP | Key: " + routingKey);
+        log.info("Pedido criado e enviado para Broker, Key: {}", routingKey);
     }
 }
