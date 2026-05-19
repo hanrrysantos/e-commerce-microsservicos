@@ -1,0 +1,80 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+
+        - id: order-service-api
+          uri: http://order-service:8080
+          predicates:
+            - Path=/api/orders/**
+
+        - id: order-service-docs
+          uri: http://order-service:8080
+          predicates:
+            - Path=/order-service/v3/api-docs
+          filters:
+            - RewritePath=/order-service/(?<segment>.*), /${segment}
+
+        - id: delivery-service-api
+          uri: http://deliveries-service:8080
+          predicates:
+            - Path=/api/deliveries/**
+
+        - id: delivery-service-docs
+          uri: http://deliveries-service:8080
+          predicates:
+            - Path=/delivery-service/v3/api-docs
+          filters:
+            - RewritePath=/delivery-service/(?<segment>.*), /${segment}
+
+        - id: payment-service-api
+          uri: http://payment-service:8080
+          predicates:
+            - Path=/api/payments/**
+
+        - id: payment-service-docs
+          uri: http://payment-service:8080
+          predicates:
+            - Path=/payment-service/v3/api-docs
+          filters:
+            - RewritePath=/payment-service/(?<segment>.*), /${segment}
+
+        - id: payment-webhook
+          uri: http://payment-service:8080
+          predicates:
+            - Path=/webhooks/**
+
+        - id: user-service-api
+          uri: http://user-service:8080
+          predicates:
+            - Path=/api/users/**
+
+        - id: user-service-docs
+          uri: http://user-service:8080
+          predicates:
+            - Path=/user-service/v3/api-docs
+          filters:
+            - RewritePath=/user-service/(?<segment>.*), /${segment}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+
+      - name: order-service
+        url: /order-service/v3/api-docs
+
+      - name: delivery-service
+        url: /delivery-service/v3/api-docs
+
+      - name: payment-service
+        url: /payment-service/v3/api-docs
+
+      - name: user-service
+        url: /user-service/v3/api-docs
