@@ -3,7 +3,6 @@ package br.com.hanrry.payment_service.service;
 import br.com.hanrry.payment_service.database.model.PaymentEntity;
 import br.com.hanrry.payment_service.database.repository.IPaymentRepository;
 import br.com.hanrry.payment_service.dto.event.OrderEventDTO;
-import br.com.hanrry.payment_service.dto.event.PaymentEventDTO;
 import br.com.hanrry.payment_service.dto.response.PaymentResponseDTO;
 import br.com.hanrry.payment_service.exception.PaymentAlreadyProcessedException;
 import br.com.hanrry.payment_service.exception.PaymentNotFoundException;
@@ -41,12 +40,25 @@ public class PaymentService {
 
     public void processPaymentFromOrder(OrderEventDTO orderEvent) {
 
-        if (paymentRepository.existsByOrderId(orderEvent.id())) {
-            throw new PaymentAlreadyProcessedException("Payment already exists for order: " + orderEvent.id());
-        }
+        PaymentEntity payment = paymentRepository.findByOrderId(orderEvent.id())
+                .map(existingPayment -> {
+                    if (existingPayment.getExternalId() != null) {
+                        throw new PaymentAlreadyProcessedException(
+                                "Payment already created for order: " + orderEvent.id()
+                        );
+                    }
 
-        PaymentEntity payment = paymentMapper.eventDTOToEntity(orderEvent);
-        PaymentEntity savedPayment = paymentRepository.save(payment);
+                    log.info(
+                            "Pagamento já existe para o pedido {}, mas ainda não possui externalId. Tentando novamente...",
+                            orderEvent.id()
+                    );
+
+                    return existingPayment;
+                })
+                .orElseGet(() -> {
+                    PaymentEntity newPayment = paymentMapper.eventDTOToEntity(orderEvent);
+                    return paymentRepository.save(newPayment);
+                });
 
         MercadoPagoConfig.setAccessToken(accessToken);
         PaymentClient paymentClient = new PaymentClient();
@@ -64,20 +76,49 @@ public class PaymentService {
         try {
             Payment mpPayment = paymentClient.create(paymentRequest);
 
-            savedPayment.setExternalId(mpPayment.getId().toString());
-            savedPayment.setQrCode(
-                    mpPayment.getPointOfInteraction()
-                            .getTransactionData()
-                            .getQrCode()
+            payment.setExternalId(mpPayment.getId().toString());
+
+            if (
+                    mpPayment.getPointOfInteraction() != null &&
+                            mpPayment.getPointOfInteraction().getTransactionData() != null
+            ) {
+                payment.setQrCode(
+                        mpPayment.getPointOfInteraction()
+                                .getTransactionData()
+                                .getQrCode()
+                );
+            }
+
+            paymentRepository.save(payment);
+
+            log.info(
+                    "Pagamento criado com sucesso para o pedido: {} | Mercado Pago ID: {}",
+                    orderEvent.id(),
+                    mpPayment.getId()
             );
 
-            PaymentEntity updatedPayment = paymentRepository.save(savedPayment);
+        } catch (MPApiException e) {
+            log.error("Erro Mercado Pago ao processar pedido {}", orderEvent.id());
+            log.error("Status code: {}", e.getApiResponse().getStatusCode());
+            log.error("Response body: {}", e.getApiResponse().getContent());
 
-            log.info("Pagamento criado com sucesso para o pedido: {}", orderEvent.id());
+            throw new PaymentProcessingException(
+                    "Error processing payment for order: " + orderEvent.id(),
+                    e
+            );
 
-        } catch (MPException | MPApiException e) {
-            log.error("Erro ao processar pagamento para o pedido {}: {}", orderEvent.id(), e.getMessage(), e);
-            throw new PaymentProcessingException("Error processing payment for order: " + orderEvent.id(), e);
+        } catch (MPException e) {
+            log.error(
+                    "Erro ao processar pagamento para o pedido {}: {}",
+                    orderEvent.id(),
+                    e.getMessage(),
+                    e
+            );
+
+            throw new PaymentProcessingException(
+                    "Error processing payment for order: " + orderEvent.id(),
+                    e
+            );
         }
     }
 
@@ -85,6 +126,7 @@ public class PaymentService {
         PaymentEntity payment = paymentRepository.findById(id).orElseThrow(
                 () -> new PaymentNotFoundException("Payment not found with this id: " + id)
         );
+
         return paymentMapper.toDTO(payment);
     }
 
@@ -92,6 +134,7 @@ public class PaymentService {
         PaymentEntity payment = paymentRepository.findByOrderId(orderId).orElseThrow(
                 () -> new PaymentNotFoundException("Payment not found with this order id: " + orderId)
         );
+
         return paymentMapper.toDTO(payment);
     }
 
