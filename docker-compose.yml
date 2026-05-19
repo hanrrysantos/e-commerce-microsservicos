@@ -7,6 +7,11 @@ services:
       - POSTGRES_DB=orders_db
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d orders_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5433:5432"
     volumes:
@@ -19,12 +24,11 @@ services:
       - POSTGRES_DB=notifications_db
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    healthcheck: # Adicione isso
+    healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d notifications_db" ]
       interval: 5s
       timeout: 5s
       retries: 5
-
     ports:
       - "5434:5432"
     volumes:
@@ -37,6 +41,11 @@ services:
       - POSTGRES_DB=deliveries_db
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d deliveries_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5435:5432"
     volumes:
@@ -49,6 +58,11 @@ services:
       - POSTGRES_DB=payments_db
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d payments_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5436:5432"
     volumes:
@@ -61,6 +75,11 @@ services:
       - POSTGRES_DB=users_db
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d users_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5437:5432"
     volumes:
@@ -73,9 +92,10 @@ services:
     image: e-commerce/order-service:1.0
     container_name: order-service
     depends_on:
-      - db-orders
-    ports:
-      - "8081:8080"
+      db-orders:
+        condition: service_healthy
+    # ports:
+    #  - "8081:8080"
     environment:
       - SPRING_DATASOURCE_HOST=db-orders
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-orders:5432/orders_db
@@ -92,8 +112,8 @@ services:
     depends_on:
       db-notifications:
         condition: service_healthy
-    ports:
-      - "8082:8080"
+    # ports:
+    #  - "8082:8080"
     environment:
       - SPRING_DATASOURCE_HOST=db-notifications
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-notifications:5432/notifications_db
@@ -110,9 +130,10 @@ services:
     image: e-commerce/deliveries-service:1.0
     container_name: deliveries-service
     depends_on:
-      - db-deliveries
-    ports:
-      - "8083:8080"
+      db-deliveries:
+        condition: service_healthy
+    # ports:
+    #  - "8083:8080"
     environment:
       - SPRING_DATASOURCE_HOST=db-deliveries
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-deliveries:5432/deliveries_db
@@ -127,9 +148,10 @@ services:
     image: e-commerce/payment-service:1.0
     container_name: payment-service
     depends_on:
-      - db-payments
-    ports:
-      - "8084:8080"
+      db-payments:
+        condition: service_healthy
+    # ports:
+    #  - "8084:8080"
     environment:
       - SPRING_DATASOURCE_HOST=db-payments
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-payments:5432/payments_db
@@ -145,15 +167,31 @@ services:
     image: e-commerce/user-service:1.0
     container_name: user-service
     depends_on:
-      - db-users
-    ports:
-      - "8085:8080"
+      db-users:
+        condition: service_healthy
+    # ports:
+    #  - "8085:8080"
     environment:
       - SPRING_DATASOURCE_HOST=db-users
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db-users:5432/users_db
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
+
+  api-gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    image: e-commerce/api-gateway:1.0
+    container_name: api-gateway
+    depends_on:
+      - order-service
+      - deliveries-service
+      - payment-service
+      - user-service
+      - notification-service
+    ports:
+      - "8080:8080"
 
 networks:
   default:
