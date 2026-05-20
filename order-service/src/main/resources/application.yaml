@@ -22,3 +22,7 @@ spring:
 
   rabbitmq:
     addresses: ${SPRING_RABBITMQ_ADDRESSES}
+
+product:
+  service:
+    url: http://product-service:8080
