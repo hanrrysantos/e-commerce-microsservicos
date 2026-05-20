@@ -69,6 +69,18 @@ spring:
           filters:
             - RewritePath=/user-service/(?<segment>.*), /${segment}
 
+        - id: product-service
+          uri: http://product-service:8080
+          predicates:
+            - Path=/api/products/**
+
+        - id: product-service-docs
+          uri: http://product-service:8080
+          predicates:
+            - Path=/product-service/v3/api-docs
+          filters:
+            - RewritePath=/product-service/(?<segment>.*), /${segment}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -87,4 +99,4 @@ springdoc:
         url: /user-service/v3/api-docs
 
       - name: product-service
-        url: /product-serviec/v3/api-docs
+        url: /product-service/v3/api-docs
