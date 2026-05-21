@@ -25,4 +25,4 @@ spring:
 
 product:
   service:
-    url: http://product-service:8080
+    url: ${PRODUCT_SERVICE_URL:http://localhost:8086}
