@@ -141,11 +141,11 @@ services:
       - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
       - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
 
-  deliveries-service:
+  delivery-service:
     build:
       context: ./delivery-service
       dockerfile: Dockerfile
-    image: e-commerce/deliveries-service:1.0
+    image: e-commerce/delivery-service:1.0
     container_name: deliveries-service
     depends_on:
       db-deliveries:
