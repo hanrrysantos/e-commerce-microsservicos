@@ -19,6 +19,3 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
-  rabbitmq:
-    addresses: ${SPRING_RABBITMQ_ADDRESSES}
