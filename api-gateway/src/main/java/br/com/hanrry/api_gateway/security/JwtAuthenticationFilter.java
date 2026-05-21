@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
 
         // rotas públicas passam sem token
-        if (PUBLIC_ROUTES.stream().anyMatch(path::startsWith)) {
+        if (PUBLIC_ROUTES.stream().anyMatch(path::contains)) {
             return chain.filter(exchange);
         }
 
