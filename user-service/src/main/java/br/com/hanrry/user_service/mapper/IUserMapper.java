@@ -3,6 +3,7 @@ package br.com.hanrry.user_service.mapper;
 import br.com.hanrry.user_service.database.model.UserEntity;
 import br.com.hanrry.user_service.dto.event.UserEventDTO;
 import br.com.hanrry.user_service.dto.request.UserRequestDTO;
+import br.com.hanrry.user_service.dto.response.UserAuthResponseDTO;
 import br.com.hanrry.user_service.dto.response.UserResponseDTO;
 import org.mapstruct.Mapper;
 
@@ -18,4 +19,6 @@ public interface IUserMapper {
     List<UserResponseDTO> toDTOList(List<UserEntity> users);
 
     UserEventDTO toEventDTO(UserEntity savedUser);
+
+    UserAuthResponseDTO toAuthDTO(UserEntity user);
 }
