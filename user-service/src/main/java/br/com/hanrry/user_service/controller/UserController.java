@@ -2,6 +2,7 @@ package br.com.hanrry.user_service.controller;
 
 import br.com.hanrry.user_service.dto.request.UpdateUserRequestDTO;
 import br.com.hanrry.user_service.dto.request.UserRequestDTO;
+import br.com.hanrry.user_service.dto.response.UserAuthResponseDTO;
 import br.com.hanrry.user_service.dto.response.UserResponseDTO;
 import br.com.hanrry.user_service.service.UserService;
 import jakarta.validation.Valid;
@@ -69,6 +70,13 @@ public class UserController {
     ){
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // endpoint interno — só o auth-service vai chamar
+    @GetMapping("/internal/email")
+    public ResponseEntity<UserAuthResponseDTO> findUserForAuth(@RequestParam String email) {
+        UserAuthResponseDTO user = userService.findUserForAuth(email);
+        return ResponseEntity.ok(user);
     }
 
 }
