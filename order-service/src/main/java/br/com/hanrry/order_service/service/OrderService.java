@@ -1,5 +1,6 @@
 package br.com.hanrry.order_service.service;
 
+import br.com.hanrry.order_service.client.ProductClient;
 import br.com.hanrry.order_service.database.model.OrderEntity;
 import br.com.hanrry.order_service.database.model.OrderItemEntity;
 import br.com.hanrry.order_service.database.repository.IOrderRepository;
@@ -7,10 +8,10 @@ import br.com.hanrry.order_service.dto.event.OrderEventDTO;
 import br.com.hanrry.order_service.dto.event.PaymentEventDTO;
 import br.com.hanrry.order_service.dto.request.OrderRequestDTO;
 import br.com.hanrry.order_service.dto.response.OrderResponseDTO;
+import br.com.hanrry.order_service.dto.response.ProductClientResponseDTO;
 import br.com.hanrry.order_service.enums.OrderStatus;
-import br.com.hanrry.order_service.exception.OrderCannotBeCancelledException;
-import br.com.hanrry.order_service.exception.OrderNotFoundException;
-import br.com.hanrry.order_service.exception.OrdersNotFoundException;
+import br.com.hanrry.order_service.enums.ProductStatus;
+import br.com.hanrry.order_service.exception.*;
 import br.com.hanrry.order_service.mapper.IOrderMapper;
 import br.com.hanrry.order_service.producer.OrderProducer;
 import lombok.RequiredArgsConstructor;
@@ -30,15 +31,32 @@ public class OrderService {
     private final IOrderMapper orderMapper;
     private final IOrderRepository orderRepository;
     private final OrderProducer orderProducer;
+    private final ProductClient productClient;
 
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO requestDTO){
         OrderEntity order = orderMapper.toEntity(requestDTO);
 
         order.getItems().forEach(item -> {
-            BigDecimal subtotal = item.getUnitPrice()
+            ProductClientResponseDTO product = productClient.findById(item.getProductId());
+
+            if (product.status() == ProductStatus.ACTIVE) {
+                throw new ProductNotAvailableException(
+                        "Product is not available: " + product.name());
+            }
+
+            if (product.stockQuantity() < item.getQuantity()) {
+                throw new InsufficientStockException(
+                        "Insufficient stock for product: " + product.name()
+                );
+            }
+
+            item.setUnitPrice(product.price());
+            item.setProductName(product.name());
+
+            BigDecimal subTotal = product.price()
                     .multiply(BigDecimal.valueOf(item.getQuantity()));
-            item.setSubtotal(subtotal);
+            item.setSubtotal(subTotal);
             item.setOrder(order);
         });
 
