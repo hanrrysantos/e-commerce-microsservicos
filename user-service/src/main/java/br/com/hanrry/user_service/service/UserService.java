@@ -5,6 +5,7 @@ import br.com.hanrry.user_service.database.repository.IUserRepository;
 import br.com.hanrry.user_service.dto.event.UserEventDTO;
 import br.com.hanrry.user_service.dto.request.UpdateUserRequestDTO;
 import br.com.hanrry.user_service.dto.request.UserRequestDTO;
+import br.com.hanrry.user_service.dto.response.UserAuthResponseDTO;
 import br.com.hanrry.user_service.dto.response.UserResponseDTO;
 import br.com.hanrry.user_service.enums.UserStatus;
 import br.com.hanrry.user_service.exception.EmailAlreadyExistsException;
@@ -13,6 +14,7 @@ import br.com.hanrry.user_service.mapper.IUserMapper;
 import br.com.hanrry.user_service.producer.UserProducer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +27,7 @@ public class UserService {
     private final IUserRepository userRepository;
     private final IUserMapper userMapper;
     private final UserProducer userProducer;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserResponseDTO registerUser(UserRequestDTO request){
@@ -34,6 +37,8 @@ public class UserService {
         }
 
         UserEntity user = userMapper.toEntity(request);
+
+        user.setPassword(passwordEncoder.encode(request.password()));
 
         UserEntity savedUser = userRepository.save(user);
 
@@ -78,7 +83,7 @@ public class UserService {
 
         if(updateUserRequestDTO.password() != null && !updateUserRequestDTO.password().isBlank()){
 
-            user.setPassword(updateUserRequestDTO.password());
+            user.setPassword(passwordEncoder.encode(updateUserRequestDTO.password()));
         }
 
         UserEntity savedUser = userRepository.save(user);
@@ -91,6 +96,13 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + id));
         user.setStatus(UserStatus.INACTIVE);
         userRepository.save(user);
+    }
+
+    public UserAuthResponseDTO findUserForAuth(String email) {
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException("User not found with email: " + email)
+        );
+        return userMapper.toAuthDTO(user);
     }
 
 }
