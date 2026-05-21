@@ -1,5 +1,6 @@
 package br.com.hanrry.user_service.database.model;
 
+import br.com.hanrry.user_service.enums.UserRole;
 import br.com.hanrry.user_service.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,6 +34,9 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
@@ -42,6 +46,7 @@ public class UserEntity {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.status = UserStatus.REGISTERED;
+        this.role = UserRole.CLIENT;
     }
 
     @PreUpdate
