@@ -119,6 +119,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
+      - PRODUCT_SERVICE_URL=http://product-service:8080
 
   notification-service:
     build:
@@ -195,6 +196,20 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_RABBITMQ_ADDRESSES=${SPRING_RABBITMQ_ADDRESSES}
 
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    image: e-commerce/auth-service:1.0
+    container_name: auth-service
+    depends_on:
+      user-service:
+        condition: service_started
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+      - USER_SERVICE_URL=http://user-service:8080
+
   product-service:
     build:
       context: ./product-service
@@ -226,9 +241,11 @@ services:
       - user-service
       - notification-service
       - product-service
-
+      - auth-service
     ports:
       - "8080:8080"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
 
 networks:
   default:
