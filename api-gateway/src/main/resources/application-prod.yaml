@@ -112,8 +112,5 @@ springdoc:
       - name: product-service
         url: /product-service/v3/api-docs
 
-      - name: auth-service
-        url: /auth-service/v3/api-docs
-
 jwt:
   secret: ${JWT_SECRET}
