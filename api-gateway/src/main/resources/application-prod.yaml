@@ -8,18 +8,10 @@ spring:
   cloud:
     gateway:
       routes:
-
         - id: auth-service-api
           uri: ${AUTH_SERVICE_URL}
           predicates:
             - Path=/api/auth/**
-
-        - id: auth-service-docs
-          uri: ${AUTH_SERVICE_URL}
-          predicates:
-            - Path=/auth-service/v3/api-docs
-          filters:
-            - RewritePath=/auth-service/(?<segment>.*), /${segment}
 
         - id: order-service-api
           uri: ${ORDER_SERVICE_URL}
@@ -31,7 +23,7 @@ spring:
           predicates:
             - Path=/order-service/v3/api-docs
           filters:
-            - RewritePath=/order-service/(?<segment>.*), /${segment}
+            - RewritePath=/order-service/(?<segment>.*), /$\{segment}
 
         - id: delivery-service-api
           uri: ${DELIVERY_SERVICE_URL}
@@ -43,7 +35,7 @@ spring:
           predicates:
             - Path=/delivery-service/v3/api-docs
           filters:
-            - RewritePath=/delivery-service/(?<segment>.*), /${segment}
+            - RewritePath=/delivery-service/(?<segment>.*), /$\{segment}
 
         - id: payment-service-api
           uri: ${PAYMENT_SERVICE_URL}
@@ -55,12 +47,7 @@ spring:
           predicates:
             - Path=/payment-service/v3/api-docs
           filters:
-            - RewritePath=/payment-service/(?<segment>.*), /${segment}
-
-        - id: payment-webhook
-          uri: ${PAYMENT_SERVICE_URL}
-          predicates:
-            - Path=/webhooks/**
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
 
         - id: user-service-api
           uri: ${USER_SERVICE_URL}
@@ -72,14 +59,7 @@ spring:
           predicates:
             - Path=/user-service/v3/api-docs
           filters:
-            - RewritePath=/user-service/(?<segment>.*), /${segment}
-
-        - id: user-service-actuator
-          uri: ${USER_SERVICE_URL}
-          predicates:
-            - Path=/user-service/actuator/**
-          filters:
-            - RewritePath=/user-service/(?<segment>.*), /${segment}
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
 
         - id: product-service-api
           uri: ${PRODUCT_SERVICE_URL}
@@ -91,24 +71,24 @@ spring:
           predicates:
             - Path=/product-service/v3/api-docs
           filters:
-            - RewritePath=/product-service/(?<segment>.*), /${segment}
+            - RewritePath=/product-service/(?<segment>.*), /$\{segment}
 
 springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
   swagger-ui:
+    enabled: true
     path: /swagger-ui.html
     urls:
       - name: order-service
         url: /order-service/v3/api-docs
-
       - name: delivery-service
         url: /delivery-service/v3/api-docs
-
       - name: payment-service
         url: /payment-service/v3/api-docs
-
       - name: user-service
         url: /user-service/v3/api-docs
-
       - name: product-service
         url: /product-service/v3/api-docs
 
