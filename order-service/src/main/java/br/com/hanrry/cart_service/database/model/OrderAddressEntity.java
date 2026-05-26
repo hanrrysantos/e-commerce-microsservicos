@@ -1,4 +1,4 @@
-package br.com.hanrry.order_service.database.model;
+package br.com.hanrry.cart_service.database.model;
 
 import jakarta.persistence.*;
 import lombok.*;
