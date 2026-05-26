@@ -146,7 +146,7 @@ services:
       context: ./delivery-service
       dockerfile: Dockerfile
     image: e-commerce/delivery-service:1.0
-    container_name: deliveries-service
+    container_name: delivery-service
     depends_on:
       db-deliveries:
         condition: service_healthy
@@ -236,7 +236,7 @@ services:
     container_name: api-gateway
     depends_on:
       - order-service
-      - deliveries-service
+      - delivery-service
       - payment-service
       - user-service
       - notification-service
