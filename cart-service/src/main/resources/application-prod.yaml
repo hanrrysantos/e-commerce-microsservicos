@@ -6,10 +6,16 @@ spring:
     name: cart-service
 
   datasource:
-    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5439}/carts_db
+    url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 2
+      minimum-idle: 0
+      idle-timeout: 30000
+      connection-timeout: 30000
+      max-lifetime: 600000
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
