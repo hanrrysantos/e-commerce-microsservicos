@@ -93,6 +93,18 @@ spring:
           filters:
             - RewritePath=/product-service/(?<segment>.*), /${segment}
 
+        - id: cart-service-api
+          uri: http://cart-service:8080
+          predicates:
+            - Path=/api/carts/**
+
+        - id: cart-service-docs
+          uri: http://cart-service:8080
+          predicates:
+            - Path=/cart-service/v3/api-docs
+          filters:
+            - RewritePath=/cart-service/(?<segment>.*), /${segment}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -115,6 +127,9 @@ springdoc:
 
       - name: auth-service
         url: /auth-service/v3/api-docs
+
+      - name: cart-service
+        url: /cart-service/v3/api-docs
 
 jwt:
   secret: ${JWT_SECRET}

@@ -1,4 +1,4 @@
-package br.com.hanrry.order_service.exception;
+package br.com.hanrry.cart_service.exception;
 
 public class InsufficientStockException extends RuntimeException {
     public InsufficientStockException(String message) {

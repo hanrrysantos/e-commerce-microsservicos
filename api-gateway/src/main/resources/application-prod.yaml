@@ -72,6 +72,18 @@ spring:
             - Path=/product-service/v3/api-docs
           filters:
             - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+            -
+        - id: cart-service-api
+          uri: ${CART_SERVICE_URL}
+          predicates:
+            - Path=/api/carts/**
+
+        - id: cart-service-docs
+          uri: ${CART_SERVICE_URL}
+          predicates:
+            - Path=/cart-service/v3/api-docs
+          filters:
+            - RewritePath=/cart-service/(?<segment>.*), /$\{segment}
 
 springdoc:
   api-docs:
@@ -93,6 +105,8 @@ springdoc:
         url: /product-service/v3/api-docs
       - name: auth-service
         url: /auth-service/v3/api-docs
+      - name: cart-service
+        url: /cart-service/v3/api-docs
 
 jwt:
   secret: ${JWT_SECRET}

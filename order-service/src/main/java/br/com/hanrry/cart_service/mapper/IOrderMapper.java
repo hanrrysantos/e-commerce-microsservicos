@@ -1,13 +1,14 @@
-package br.com.hanrry.order_service.mapper;
+package br.com.hanrry.cart_service.mapper;
 
-import br.com.hanrry.order_service.database.model.OrderAddressEntity;
-import br.com.hanrry.order_service.database.model.OrderEntity;
-import br.com.hanrry.order_service.database.model.OrderItemEntity;
-import br.com.hanrry.order_service.dto.event.OrderEventDTO;
-import br.com.hanrry.order_service.dto.request.OrderAddressRequestDTO;
-import br.com.hanrry.order_service.dto.request.OrderItemRequestDTO;
-import br.com.hanrry.order_service.dto.request.OrderRequestDTO;
-import br.com.hanrry.order_service.dto.response.OrderResponseDTO;
+import br.com.hanrry.cart_service.database.model.OrderAddressEntity;
+import br.com.hanrry.cart_service.database.model.OrderEntity;
+import br.com.hanrry.cart_service.database.model.OrderItemEntity;
+import br.com.hanrry.cart_service.dto.event.OrderEventDTO;
+import br.com.hanrry.cart_service.dto.event.OrderItemEventDTO;
+import br.com.hanrry.cart_service.dto.request.OrderAddressRequestDTO;
+import br.com.hanrry.cart_service.dto.request.OrderItemRequestDTO;
+import br.com.hanrry.cart_service.dto.request.OrderRequestDTO;
+import br.com.hanrry.cart_service.dto.response.OrderResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -27,7 +28,7 @@ public interface IOrderMapper {
 
     @Mapping(target = "order", ignore = true)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "subtotal", ignore = true)
+    @Mapping(target = "subTotal", ignore = true)
     @Mapping(target = "unitPrice", ignore = true)
     @Mapping(target = "productName", ignore = true)
     OrderItemEntity toItemEntity(OrderItemRequestDTO requestDTO);
@@ -39,6 +40,8 @@ public interface IOrderMapper {
     OrderResponseDTO toDTO(OrderEntity entity);
 
     OrderEventDTO toEventDTO(OrderEntity entity);
+
+    OrderItemEventDTO toItemEventDTO(OrderItemEntity entity);
 
     List<OrderResponseDTO> toDTOList(List<OrderEntity> orders);
 }
