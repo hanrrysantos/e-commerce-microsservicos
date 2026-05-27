@@ -10,5 +10,5 @@ VALUES
         'ADMIN',
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP
-    );
+    )
 ON CONFLICT (email) DO NOTHING;
