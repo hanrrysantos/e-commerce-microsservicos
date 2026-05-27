@@ -5,7 +5,6 @@
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 ![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=black)
 ![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
@@ -59,7 +58,7 @@ O projeto foi construido com foco em **comunicacao assincrona**, **baixo acoplam
 ## Fluxo Principal
 
 1. O cliente realiza login e recebe um token JWT.
-2. As requisicoes vão para o API Gateway.
+2. O cliente envia as requisicoes para o API Gateway.
 3. O API Gateway valida o token e encaminha a requisicao para o servico correto.
 4. O cliente adiciona produtos ao carrinho.
 5. No checkout, o `cart-service` cria o pedido no `order-service`.
@@ -71,7 +70,44 @@ O projeto foi construido com foco em **comunicacao assincrona**, **baixo acoplam
 11. `delivery-service` e `notification-service` consomem o evento e continuam o fluxo.
 
 <div align="center">
-  <img src="./architecture-linkedin.svg" alt="Arquitetura do E-commerce Microservices" width="900">
+  <img width="1139" height="666" alt="Image" src="https://github.com/user-attachments/assets/c73e7fd8-8e00-4a38-9554-c082771e40a6" />
+</div>
+
+---
+
+## Demonstracao Visual
+
+<table width="100%">
+  <tr>
+    <td align="center" width="50%">
+      <b>Deploy dos Microsservicos</b><br>
+      <img width="1004" height="488" alt="Image" src="https://github.com/user-attachments/assets/83b0578c-ec74-4554-bf34-859459e97489"/>
+      <p><i>Servicos Docker publicados individualmente no Render.</i></p>
+    </td>
+    <td align="center" width="50%">
+      <b>Swagger Centralizado</b><br>
+      <img width="575" height="209" alt="Image" src="https://github.com/user-attachments/assets/7351d173-7b93-4569-9dab-eebeb5043075" />
+      <p><i>Documentacao OpenAPI agregada pelo API Gateway.</i></p>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <b>Pedido Recebido</b><br>
+      <img width="538" height="254" alt="Image" src="https://github.com/user-attachments/assets/f7a024a3-a922-417b-bb48-d06cf3082d2b" />
+      <p><i>Notificacao enviada apos criacao do pedido.</i></p>
+    </td>
+    <td align="center" width="50%">
+      <b>Pagamento Aprovado</b><br>
+      <img width="762" height="223" alt="Image" src="https://github.com/user-attachments/assets/38286f37-34f7-43f1-921f-73b03531e6de" />
+      <p><i>Notificacao enviada apos confirmacao do pagamento.</i></p>
+    </td>
+  </tr>
+</table>
+
+<div align="center">
+  <b>Webhook Mercado Pago</b><br>
+  <img width="800" height="253" alt="Image" src="https://github.com/user-attachments/assets/5eb2b54b-0530-40e4-b205-afee9641e8f5" />
+  <p><i>Evento de pagamento entregue ao payment-service via webhook.</i></p>
 </div>
 
 ---
@@ -123,7 +159,7 @@ O projeto utiliza **microsservicos orientados a eventos**, combinando comunicaca
 - **Event-driven Architecture:** eventos de pedido e pagamento sao publicados no RabbitMQ.
 - **OpenFeign:** comunicacao interna entre servicos quando ha necessidade de consulta direta.
 - **Flyway:** versionamento de schema e dados iniciais.
-- **Docker Compose:** orquestracao local dos bancos, servicos, gateway e frontend.
+- **Docker Compose:** orquestracao local dos bancos, microsservicos e gateway.
 
 ---
 
@@ -211,17 +247,18 @@ docker-compose up --build
 
 ```text
 e-commerce/
-├── api-gateway/
-├── auth-service/
-├── user-service/
-├── product-service/
-├── cart-service/
-├── order-service/
-├── payment-service/
-├── delivery-service/
-├── notification-service/
-├── docker-compose.yml
-└── README.md
+|-- api-gateway/
+|-- auth-service/
+|-- user-service/
+|-- product-service/
+|-- cart-service/
+|-- order-service/
+|-- payment-service/
+|-- delivery-service/
+|-- notification-service/
+|-- docs/
+|-- docker-compose.yml
+`-- README.md
 ```
 
 ---
