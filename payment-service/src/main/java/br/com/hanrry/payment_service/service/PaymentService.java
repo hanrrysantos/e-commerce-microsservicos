@@ -68,7 +68,7 @@ public class PaymentService {
                 .paymentMethodId("pix")
                 .payer(
                         PaymentPayerRequest.builder()
-                                .email("hanrry.jsantos@gmail.com")
+                                .email(payment.getClientEmail())
                                 .build()
                 )
                 .build();
