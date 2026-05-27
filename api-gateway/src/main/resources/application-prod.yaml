@@ -13,6 +13,13 @@ spring:
           predicates:
             - Path=/api/auth/**
 
+        - id: auth-service-docs
+          uri: ${AUTH_SERVICE_URL}
+          predicates:
+            - Path=/auth-service/v3/api-docs
+          filters:
+            - RewritePath=/auth-service/(?<segment>.*), /$\{segment}
+
         - id: order-service-api
           uri: ${ORDER_SERVICE_URL}
           predicates:
@@ -72,7 +79,7 @@ spring:
             - Path=/product-service/v3/api-docs
           filters:
             - RewritePath=/product-service/(?<segment>.*), /$\{segment}
-            -
+
         - id: cart-service-api
           uri: ${CART_SERVICE_URL}
           predicates:
