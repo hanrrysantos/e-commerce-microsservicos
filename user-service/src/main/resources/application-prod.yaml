@@ -30,7 +30,9 @@ spring:
   rabbitmq:
     addresses: ${SPRING_RABBITMQ_ADDRESSES}
 
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
+  spring:
+    flyway:
+      enabled: true
+      baseline-on-migrate: true
+      baseline-version: 0
+      locations: classpath:db/migration
