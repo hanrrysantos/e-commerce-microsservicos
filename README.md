@@ -70,7 +70,7 @@ O projeto foi construido com foco em **comunicacao assincrona**, **baixo acoplam
 11. `delivery-service` e `notification-service` consomem o evento e continuam o fluxo.
 
 <div align="center">
-  <img width="1139" height="666" alt="Image" src="https://github.com/user-attachments/assets/c73e7fd8-8e00-4a38-9554-c082771e40a6" />
+  <img width="950" height="650" alt="Image" src="https://github.com/user-attachments/assets/c73e7fd8-8e00-4a38-9554-c082771e40a6" />
 </div>
 
 ---
