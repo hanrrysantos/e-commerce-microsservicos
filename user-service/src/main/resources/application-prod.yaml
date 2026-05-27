@@ -29,3 +29,7 @@ spring:
 
   rabbitmq:
     addresses: ${SPRING_RABBITMQ_ADDRESSES}
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
