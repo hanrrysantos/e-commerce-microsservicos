@@ -13,7 +13,7 @@
 
 ## Visao Geral
 
-O **E-commerce Microservices** e uma plataforma de e-commerce desenvolvida com **Java, Spring Boot e arquitetura de microsservicos**, criada para simular um fluxo real de compra: autenticacao, catalogo de produtos, carrinho, criacao de pedido, pagamento via Mercado Pago, confirmacao por webhook, entrega e notificacoes.
+O **E-commerce Microservices** é uma plataforma de e-commerce desenvolvida com **Java, Spring Boot e arquitetura de microsservicos**, criada para simular um fluxo real de compra: autenticacao, catalogo de produtos, carrinho, criacao de pedido, pagamento via Mercado Pago, confirmacao por webhook, entrega e notificacoes.
 
 O projeto foi construido com foco em **comunicacao assincrona**, **baixo acoplamento entre servicos** e **responsabilidade isolada por dominio**. Cada microsservico possui seu proprio banco de dados PostgreSQL, enquanto eventos de negocio sao trafegados via RabbitMQ.
 
