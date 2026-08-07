@@ -7,6 +7,9 @@ spring:
 
   cloud:
     gateway:
+      httpclient:
+        connect-timeout: 30000
+        response-timeout: 60s
       routes:
         - id: auth-service-api
           uri: ${AUTH_SERVICE_URL}
@@ -16,9 +19,19 @@ spring:
         - id: auth-service-docs
           uri: ${AUTH_SERVICE_URL}
           predicates:
-            - Path=/auth-service/v3/api-docs
+            - Path=/auth-service/v3/api-docs,/auth-service/v3/api-docs/**
           filters:
             - RewritePath=/auth-service/(?<segment>.*), /$\{segment}
+            - name: Retry
+              args:
+                retries: 3
+                statuses: TOO_MANY_REQUESTS, BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
+                methods: GET
+                backoff:
+                  firstBackoff: 3s
+                  maxBackoff: 20s
+                  factor: 2
+                  basedOnPreviousValue: false
 
         - id: order-service-api
           uri: ${ORDER_SERVICE_URL}
@@ -28,9 +41,19 @@ spring:
         - id: order-service-docs
           uri: ${ORDER_SERVICE_URL}
           predicates:
-            - Path=/order-service/v3/api-docs
+            - Path=/order-service/v3/api-docs,/order-service/v3/api-docs/**
           filters:
             - RewritePath=/order-service/(?<segment>.*), /$\{segment}
+            - name: Retry
+              args:
+                retries: 3
+                statuses: TOO_MANY_REQUESTS, BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
+                methods: GET
+                backoff:
+                  firstBackoff: 3s
+                  maxBackoff: 20s
+                  factor: 2
+                  basedOnPreviousValue: false
 
         - id: delivery-service-api
           uri: ${DELIVERY_SERVICE_URL}
@@ -40,9 +63,19 @@ spring:
         - id: delivery-service-docs
           uri: ${DELIVERY_SERVICE_URL}
           predicates:
-            - Path=/delivery-service/v3/api-docs
+            - Path=/delivery-service/v3/api-docs,/delivery-service/v3/api-docs/**
           filters:
             - RewritePath=/delivery-service/(?<segment>.*), /$\{segment}
+            - name: Retry
+              args:
+                retries: 3
+                statuses: TOO_MANY_REQUESTS, BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
+                methods: GET
+                backoff:
+                  firstBackoff: 3s
+                  maxBackoff: 20s
+                  factor: 2
+                  basedOnPreviousValue: false
 
         - id: payment-service-api
           uri: ${PAYMENT_SERVICE_URL}
@@ -52,9 +85,24 @@ spring:
         - id: payment-service-docs
           uri: ${PAYMENT_SERVICE_URL}
           predicates:
-            - Path=/payment-service/v3/api-docs
+            - Path=/payment-service/v3/api-docs,/payment-service/v3/api-docs/**
           filters:
             - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+            - name: Retry
+              args:
+                retries: 3
+                statuses: TOO_MANY_REQUESTS, BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
+                methods: GET
+                backoff:
+                  firstBackoff: 3s
+                  maxBackoff: 20s
+                  factor: 2
+                  basedOnPreviousValue: false
+
+        - id: payment-webhook
+          uri: ${PAYMENT_SERVICE_URL}
+          predicates:
+            - Path=/webhooks/**
 
         - id: user-service-api
           uri: ${USER_SERVICE_URL}
@@ -64,9 +112,19 @@ spring:
         - id: user-service-docs
           uri: ${USER_SERVICE_URL}
           predicates:
-            - Path=/user-service/v3/api-docs
+            - Path=/user-service/v3/api-docs,/user-service/v3/api-docs/**
           filters:
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+            - name: Retry
+              args:
+                retries: 3
+                statuses: TOO_MANY_REQUESTS, BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
+                methods: GET
+                backoff:
+                  firstBackoff: 3s
+                  maxBackoff: 20s
+                  factor: 2
+                  basedOnPreviousValue: false
 
         - id: product-service-api
           uri: ${PRODUCT_SERVICE_URL}
@@ -76,9 +134,19 @@ spring:
         - id: product-service-docs
           uri: ${PRODUCT_SERVICE_URL}
           predicates:
-            - Path=/product-service/v3/api-docs
+            - Path=/product-service/v3/api-docs,/product-service/v3/api-docs/**
           filters:
             - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+            - name: Retry
+              args:
+                retries: 3
+                statuses: TOO_MANY_REQUESTS, BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
+                methods: GET
+                backoff:
+                  firstBackoff: 3s
+                  maxBackoff: 20s
+                  factor: 2
+                  basedOnPreviousValue: false
 
         - id: cart-service-api
           uri: ${CART_SERVICE_URL}
@@ -88,9 +156,33 @@ spring:
         - id: cart-service-docs
           uri: ${CART_SERVICE_URL}
           predicates:
-            - Path=/cart-service/v3/api-docs
+            - Path=/cart-service/v3/api-docs,/cart-service/v3/api-docs/**
           filters:
             - RewritePath=/cart-service/(?<segment>.*), /$\{segment}
+            - name: Retry
+              args:
+                retries: 3
+                statuses: TOO_MANY_REQUESTS, BAD_GATEWAY, SERVICE_UNAVAILABLE, GATEWAY_TIMEOUT
+                methods: GET
+                backoff:
+                  firstBackoff: 3s
+                  maxBackoff: 20s
+                  factor: 2
+                  basedOnPreviousValue: false
+
+gateway:
+  docs:
+    cache-ttl-minutes: 30
+    max-retries: 4
+    retry-backoff-seconds: 5
+  services:
+    auth-service: ${AUTH_SERVICE_URL}
+    user-service: ${USER_SERVICE_URL}
+    product-service: ${PRODUCT_SERVICE_URL}
+    cart-service: ${CART_SERVICE_URL}
+    order-service: ${ORDER_SERVICE_URL}
+    payment-service: ${PAYMENT_SERVICE_URL}
+    delivery-service: ${DELIVERY_SERVICE_URL}
 
 springdoc:
   api-docs:
@@ -99,21 +191,23 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
+    disable-swagger-default-url: true
+    urls-primary-name: auth-service
     urls:
-      - name: order-service
-        url: /order-service/v3/api-docs
-      - name: delivery-service
-        url: /delivery-service/v3/api-docs
-      - name: payment-service
-        url: /payment-service/v3/api-docs
-      - name: user-service
-        url: /user-service/v3/api-docs
-      - name: product-service
-        url: /product-service/v3/api-docs
       - name: auth-service
-        url: /auth-service/v3/api-docs
+        url: /docs/auth-service
+      - name: user-service
+        url: /docs/user-service
+      - name: product-service
+        url: /docs/product-service
       - name: cart-service
-        url: /cart-service/v3/api-docs
+        url: /docs/cart-service
+      - name: order-service
+        url: /docs/order-service
+      - name: payment-service
+        url: /docs/payment-service
+      - name: delivery-service
+        url: /docs/delivery-service
 
 jwt:
   secret: ${JWT_SECRET}

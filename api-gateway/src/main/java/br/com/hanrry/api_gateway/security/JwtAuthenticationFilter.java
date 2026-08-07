@@ -10,29 +10,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private final JwtUtil jwtUtil;
 
-    private static final List<String> PUBLIC_ROUTES = List.of(
-            "/api/auth/login",
-            "/api/users/register",
-            "/swagger-ui",
-            "/v3/api-docs",
-            "/webjars",
-            "/webhooks"
-    );
-
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
-        // rotas públicas passam sem token
-        if (PUBLIC_ROUTES.stream().anyMatch(path::contains)) {
+        if (isPublic(path)) {
             return chain.filter(exchange);
         }
 
@@ -52,7 +40,6 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             return exchange.getResponse().setComplete();
         }
 
-        // adiciona email e role como headers para os microsserviços
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractRole(token);
 
@@ -64,8 +51,21 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         return chain.filter(exchange.mutate().request(mutatedRequest).build());
     }
 
+    private boolean isPublic(String path) {
+        return path.equals("/api/auth/login")
+                || path.equals("/api/users/register")
+                || path.startsWith("/swagger-ui")
+                || path.equals("/swagger-ui.html")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/docs/")
+                || path.startsWith("/webjars")
+                || path.startsWith("/webhooks")
+                || path.endsWith("/v3/api-docs")
+                || path.contains("/v3/api-docs/");
+    }
+
     @Override
     public int getOrder() {
-        return -1; // executa antes de qualquer outro filtro
+        return -1;
     }
 }
